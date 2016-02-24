@@ -1,6 +1,7 @@
 function Initialize()
 
 	msSteam = SKIN:GetMeasure("MeasureSteamAchievements")
+	msSteamImage = SKIN:GetMeasure("MeasureSteamImage")
 	mtTitle = SKIN:GetMeter("AchievementTitle")
 	mtDetail = SKIN:GetMeter("AchievementDetail")
 	
@@ -8,10 +9,7 @@ end -- function Initialize
 
 function Update()
 
-	local sHtml = ReadFile("sample.txt")
-
-	--SKIN:Bang('!UpdateMeasure MeasureSteam')
-	--sHtml = msMeasureSteam:GetStringValue()
+	local sHtml = msSteam:GetStringValue()
 	
 	if string.len(sHtml) ~= 0 then
 	
@@ -31,7 +29,6 @@ function Update()
 			end
 			
 			-- play time
-			-- <div id="tsblVal">10.9h</div>
 			local pt = string.match(l, "<div id=\"tsblVal\">([%a%d%.]+)</div>")
 			if pt ~= nil then
 				SKIN:Bang('!SetOption TimePlayed Text \"' .. pt .. '\"')
@@ -81,23 +78,19 @@ function Update()
 		
 		-- sort rows by date
 		table.sort(Rows, SortByDate)
-
-		-- for idx,val in ipairs(Rows) do
-			-- if val.Title ~= nil then print(val.Title) end
-			-- if val.Description ~= nil then print(val.Description) end			
-			-- if val.Image ~= nil then print(val.Image) end
-			-- if val.Date ~= nil then print(val.Date) end
-		-- end			
-		
+	
+		-- format date
 		local dateString = os.date("%d %b %Y", Rows[1].Date)
 		
+		-- update skin
 		SKIN:Bang('!SetOption AchievementTitle Text \"' .. Rows[1].Title .. '\"')
 		SKIN:Bang('!SetOption AchievementDetail Text \"' .. Rows[1].Description .. '\"')
 		SKIN:Bang('!SetOption AchievementDate Text \"' .. dateString .. '\"')
 		
-		print(Rows[1].Image)
 		SKIN:Bang('!SetOption MeasureSteamImage URL \"' .. Rows[1].Image .. '\"')
 		SKIN:Bang('!UpdateMeasure MeasureSteamImage')
+		
+		SKIN:Bang('!UpdateMeter AchievementImage')
 	end	
 	
 end -- function Update
@@ -114,7 +107,6 @@ function SortByDate(a, b)
 end
 
 function ConvertDate(d, m, y, hrs, mins, ampm)
-	--print(d .. ", " .. m .. ", " .. y .. ", " .. hrs .. ", " .. mins .. ", " .. ampm)
 	local months = {
 		jan = 1, feb = 2, mar = 3, apr = 4, may = 5, jun = 6,
 		jul = 7, aug = 8, sep = 9, oct = 10, nov = 11, dec = 12
